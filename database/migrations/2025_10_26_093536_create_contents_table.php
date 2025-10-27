@@ -12,14 +12,14 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('contents', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('module_id')->constrained()->onDelete('cascade');
-            $table->string('title');
-            $table->enum('content_type', ['video', 'pdf', 'text']);
-            $table->string('file_path')->nullable();
-            $table->text('description')->nullable();
-            $table->integer('position')->default(0);
-            $table->timestamps();
+    $table->id();
+    $table->foreignId('module_id')->constrained()->onDelete('cascade');
+    $table->string('title');
+    $table->enum('type', ['video','audio','pdf','text','image']);
+    $table->string('file_path')->nullable();
+    $table->text('text')->nullable(); // for text content
+    $table->string('length')->nullable();
+    $table->timestamps();
         });
     }
 

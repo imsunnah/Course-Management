@@ -9,64 +9,90 @@ use App\Models\Content;
 
 class CourseController extends Controller
 {    // List all courses
-    public function index()
+     public function index()
     {
-        $courses = Course::all(); // fetch all courses
+        $courses = Course::latest()->paginate(10);
         return view('course.index', compact('courses'));
     }
-
-    // Show single course
-    public function show($id)
-    {
-        $course = Course::with('modules.contents')->findOrFail($id);
-        return view('course.show', compact('course'));
-    }
-
+    // Show create form
     public function create()
     {
-        return view('course.show');
+        return view('course.create');
     }
 
-    public function store(Request $request)
+    // Store a new course
+ public function store(Request $request)
+{
+    $request->validate([
+        'title' => 'required|string|max:255',
+        'feature_video' => 'nullable|file|mimes:mp4,mov,avi|max:102400', // max 100MB
+        'modules.*.title' => 'required|string|max:255',
+        'modules.*.contents.*.title' => 'required|string|max:255',
+        'modules.*.contents.*.file' => 'nullable|file|mimes:mp4,mov,avi,mp3,pdf,jpg,png|max:51200',
+    ]);
+
+    $course = new Course();
+    $course->title = $request->title;
+    $course->description = $request->description;
+    $course->category = $request->category;
+
+    if ($request->hasFile('feature_video')) {
+        $course->feature_video = $request->file('feature_video')->store('feature_videos', 'public');
+    }
+
+    $course->save();
+
+    // Modules
+    foreach ($request->modules ?? [] as $moduleData) {
+        $module = $course->modules()->create([
+            'title' => $moduleData['title'],
+            'description' => $moduleData['description'] ?? null,
+        ]);
+
+        // Contents
+        foreach ($moduleData['contents'] ?? [] as $contentData) {
+            $filePath = null;
+            if (!empty($contentData['file'])) {
+                $filePath = $contentData['file']->store('contents', 'public');
+            }
+            $module->contents()->create([
+                'title' => $contentData['title'],
+                'type' => $contentData['type'],
+                'file_path' => $filePath,
+                'length' => $contentData['length'] ?? null,
+                'text' => $contentData['text'] ?? null,
+            ]);
+        }
+    }
+
+    return redirect()->route('courses.index')->with('success', 'Course created successfully!');
+}
+
+
+    // Show edit form
+    public function edit(Course $course)
     {
-        $request->validate([
+        return view('course.edit', compact('course'));
+    }
+
+    // Update a course
+    public function update(Request $request, Course $course)
+    {
+        $validated = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'modules.*.title' => 'required|string|max:255',
-            'modules.*.contents.*.title' => 'required|string|max:255',
-            'modules.*.contents.*.file_path' => 'nullable|file',
+            'duration' => 'nullable|string|max:100',
         ]);
 
-        // Create Course
-        $course = Course::create([
-            'title' => $request->title,
-            'description' => $request->description,
-            'slug' => \Str::slug($request->title),
-        ]);
+        $course->update($validated);
 
-        // Loop Modules
-        foreach ($request->modules as $moduleData) {
-            $module = $course->modules()->create([
-                'title' => $moduleData['title'],
-                'description' => $moduleData['description'] ?? null,
-            ]);
+        return redirect()->route('courses.index')->with('success', 'Course updated successfully!');
+    }
 
-            // Loop Contents
-            foreach ($moduleData['contents'] as $contentData) {
-                $filePath = null;
-                if (isset($contentData['file_path'])) {
-                    $filePath = $contentData['file_path']->store('contents', 'public');
-                }
-
-                $module->contents()->create([
-                    'title' => $contentData['title'],
-                    'content_type' => $contentData['content_type'] ?? 'video',
-                    'description' => $contentData['description'] ?? null,
-                    'file_path' => $filePath,
-                ]);
-            }
-        }
-
-        return redirect()->route('courses.index')->with('success', 'Course created successfully!');
+    // Delete a course
+    public function destroy(Course $course)
+    {
+        $course->delete();
+        return redirect()->route('courses.index')->with('success', 'Course deleted successfully!');
     }
 }

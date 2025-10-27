@@ -11,12 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('courses', function (Blueprint $table) {
-            $table->id();
-                      $table->string('title');
-            $table->text('description')->nullable();
-            $table->timestamps();
-        });
+    Schema::create('courses', function (Blueprint $table) {
+    $table->id();
+    $table->string('title');
+    $table->text('description')->nullable();
+    $table->string('category')->nullable();
+    $table->string('feature_video')->nullable(); // stores uploaded feature video path
+    $table->timestamps();
+    });
     }
 
     /**
