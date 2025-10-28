@@ -14,9 +14,12 @@ return new class extends Migration
     Schema::create('courses', function (Blueprint $table) {
     $table->id();
     $table->string('title');
-    $table->text('description')->nullable();
-    $table->string('category')->nullable();
-    $table->string('feature_video')->nullable(); // stores uploaded feature video path
+    $table->string('slug')->nullable();
+    $table->text('summary')->nullable();
+    $table->string('category_id')->nullable();
+    $table->string('level')->nullable();
+    $table->integer('course_price')->nullable();
+    $table->string('feature_video')->nullable();
     $table->timestamps();
     });
     }
