@@ -9,11 +9,8 @@ use App\Http\Controllers\CategoryController;
 
 Route::get('/', [AuthenticatedSessionController::class, 'create']);
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth'])->name('dashboard');
-
 Route::middleware('auth')->group(function () {
+    Route::get('/dashboard', [ProfileController::class, 'index'])->name('dashboard');
     Route::resource('courses', CourseController::class);
     Route::resource('categories', CategoryController::class);
     Route::get('categories/{category}/toggle', [CategoryController::class, 'toggleStatus'])->name('categories.toggle');

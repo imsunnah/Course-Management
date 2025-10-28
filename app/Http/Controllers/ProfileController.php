@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProfileUpdateRequest;
+use App\Models\Category;
+use App\Models\Course;
+use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -14,6 +17,30 @@ class ProfileController extends Controller
     /**
      * Display the user's profile form.
      */
+       public function index()
+    {
+        // Counts
+        $coursesCount = Course::count();
+        $categoriesCount = Category::count();
+        $usersCount = User::count();
+
+        // Revenue (sum of course_price)
+        $revenue = Course::sum('course_price');
+
+        // Recent courses (latest 5)
+        $recentCourses = Course::with('category')
+                            ->orderBy('created_at', 'desc')
+                            ->take(5)
+                            ->get();
+
+        return view('dashboard', compact(
+            'coursesCount',
+            'categoriesCount',
+            'usersCount',
+            'revenue',
+            'recentCourses'
+        ));
+    }
     public function edit(Request $request): View
     {
         return view('profile.edit', [

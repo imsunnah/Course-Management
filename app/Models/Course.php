@@ -25,7 +25,10 @@ class Course extends Model
             $course->slug = $course->generateUniqueSlug($course->title, $course->id);
         });
     }
-
+    public function category()
+    {
+        return $this->belongsTo(Category::class);
+    }
     public function generateUniqueSlug($name, $acceptId = null)
     {
         $slug = Str::slug($name);
