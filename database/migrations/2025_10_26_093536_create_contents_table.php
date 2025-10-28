@@ -15,7 +15,7 @@ return new class extends Migration
         Schema::create('contents', function (Blueprint $table) {
             $table->id();
             $table->foreignIdFor(Module::class)->constrained()->cascadeOnDelete();
-            $table->string('title');
+            $table->text('title');
             $table->string('image')->nullable();
             $table->boolean('video_type')->nullable();
             $table->string('video_path')->nullable();
