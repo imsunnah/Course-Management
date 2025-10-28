@@ -163,13 +163,11 @@
                 moduleDiv.remove();
             });
 
-            // Add content button
             moduleDiv.querySelector('.add-content-btn').addEventListener('click', function() {
                 addContent(moduleDiv.querySelector('.contents-container'), moduleCount);
             });
         });
 
-        // Add Content
         function addContent(container, moduleIndex) {
             const contentCount = container.querySelectorAll('.content-item').length + 1;
             const contentDiv = document.createElement('div');
@@ -214,10 +212,8 @@
 
             container.appendChild(contentDiv);
 
-            // Remove content
             contentDiv.querySelector('.remove-content').addEventListener('click', () => contentDiv.remove());
 
-            // Toggle file/link input based on video type
             const typeSelect = contentDiv.querySelector('.video-type-select');
             const fileGroup = contentDiv.querySelector('.video-file-group');
             const linkGroup = contentDiv.querySelector('.video-link-group');

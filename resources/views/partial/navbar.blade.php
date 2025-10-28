@@ -8,8 +8,7 @@
                 <li class="nav-item dropdown">
                     <a class="nav-link d-flex align-items-center" href="#" id="userDropdown"
                         data-bs-toggle="dropdown">
-                        <img src="https://ui-avatars.com/api/?name=User&background=0D8ABC&color=fff" alt="User Avatar"
-                            class="rounded-circle me-2" width="36" height="36">
+
                         <span class="fw-semibold text-dark d-none d-sm-inline">Hello,
                             {{ Auth::user()->name ?? 'User' }}</span>
                         <i class="fa fa-angle-down ms-1 text-muted"></i>

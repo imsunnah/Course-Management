@@ -65,7 +65,6 @@
             </div>
         </div>
 
-        {{-- --- Course Curriculum/Modules Section (MODIFIED FOR SIZE) --- --}}
         <h2 class="mb-5 text-secondary fw-bolder display-6">Course Curriculum 📚</h2>
 
         @if ($course->modules->count())
@@ -73,7 +72,6 @@
                 @foreach ($course->modules as $modIndex => $module)
                     <div class="accordion-item shadow-lg mb-4 border border-info rounded-3">
                         <h3 class="accordion-header" id="moduleHeading{{ $module->id }}">
-                            {{-- INCREASED FONT SIZE (fs-4) AND PADDING (p-4) --}}
                             <button class="accordion-button **fs-4** fw-bold bg-info text-white **p-4** collapsed"
                                 type="button" data-bs-toggle="collapse"
                                 data-bs-target="#moduleCollapse{{ $module->id }}"
@@ -86,62 +84,57 @@
                         <div id="moduleCollapse{{ $module->id }}"
                             class="accordion-collapse collapse {{ $modIndex == 0 ? 'show' : '' }}"
                             aria-labelledby="moduleHeading{{ $module->id }}" data-bs-parent="#courseModulesAccordion">
-                            <div class="accordion-body **p-5**"> {{-- INCREASED PADDING --}}
-                                <p class="text-muted **fs-6** mb-5">{!! $module->description !!}</p> {{-- BOLDER DESCRIPTION TEXT --}}
+                            <div class="accordion-body **p-5**">
+                                <p class="text-muted **fs-6** mb-5">{!! $module->description !!}</p>
 
                                 @if ($module->contents->count())
                                     <ul class="list-group list-group-flush border rounded overflow-hidden">
                                         @foreach ($module->contents as $contIndex => $content)
                                             <li class="list-group-item list-group-item-action **py-4 px-md-5**">
-                                                {{-- INCREASED VERTICAL PADDING --}}
                                                 <a class="text-decoration-none text-dark d-block" data-bs-toggle="collapse"
                                                     href="#contentCollapse{{ $content->id }}" role="button"
                                                     aria-expanded="false"
                                                     aria-controls="contentCollapse{{ $content->id }}">
                                                     <div class="d-flex justify-content-between align-items-center">
-                                                        {{-- INCREASED FONT SIZE (fs-5) --}}
                                                         <span class="fw-semibold **fs-5**">
                                                             <i class="fas fa-play-circle me-3 text-primary"></i>
-                                                            {{-- LARGER ICON MARGIN --}}
                                                             Content {{ $contIndex + 1 }}: {{ $content->title }}
                                                         </span>
-
                                                     </div>
                                                 </a>
+                                                <div class="collapse mt-4 p-4 bg-light rounded-3 shadow-sm"
+                                                    id="contentCollapse{{ $content->id }}">
+                                                    <p class="mb-3 small">
+                                                        <strong>Source:</strong>
+                                                        <span
+                                                            class="badge bg-{{ $content->video_type == 0 ? 'primary' : 'danger' }}">
+                                                            {{ $content->video_type == 0 ? 'File Upload' : 'External Link' }}
+                                                        </span>
+                                                    </p>
 
-                                       <div class="collapse mt-4 p-4 bg-light rounded-3 shadow-sm" id="contentCollapse{{ $content->id }}">
-    {{-- Source Badge --}}
-    <p class="mb-3 small">
-        <strong>Source:</strong>
-        <span class="badge bg-{{ $content->video_type == 0 ? 'primary' : 'danger' }}">
-            {{ $content->video_type == 0 ? 'File Upload' : 'External Link' }}
-        </span>
-    </p>
-
-    @if($content->video_type == 0 && $content->video_path)
-        {{-- Local Video File --}}
-        <div class="ratio ratio-16x9 rounded-3 overflow-hidden">
-            <video controls>
-                <source src="{{ asset('storage/' . $content->video_path) }}" type="video/mp4">
-                Your browser does not support the video tag.
-            </video>
-        </div>
-    @elseif($content->video_type == 1 && $content->video_link)
-        {{-- External Link --}}
-        <p class="small mb-0">
-            <strong>Link:</strong>
-            <a href="{{ $content->video_link }}" target="_blank" class="text-decoration-underline">
-                {{ $content->video_link }}
-            </a>
-        </p>
-    @else
-        <div class="alert alert-warning small py-2">
-            Video content is missing for this lesson.
-        </div>
-    @endif
-</div>
-
-
+                                                    @if ($content->video_type == 0 && $content->video_path)
+                                                        <div class="ratio ratio-16x9 rounded-3 overflow-hidden">
+                                                            <video controls>
+                                                                <source
+                                                                    src="{{ asset('storage/' . $content->video_path) }}"
+                                                                    type="video/mp4">
+                                                                Your browser does not support the video tag.
+                                                            </video>
+                                                        </div>
+                                                    @elseif($content->video_type == 1 && $content->video_link)
+                                                        <p class="small mb-0">
+                                                            <strong>Link:</strong>
+                                                            <a href="{{ $content->video_link }}" target="_blank"
+                                                                class="text-decoration-underline">
+                                                                {{ $content->video_link }}
+                                                            </a>
+                                                        </p>
+                                                    @else
+                                                        <div class="alert alert-warning small py-2">
+                                                            Video content is missing for this lesson.
+                                                        </div>
+                                                    @endif
+                                                </div>
                                             </li>
                                         @endforeach
                                     </ul>

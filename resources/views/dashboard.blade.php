@@ -95,7 +95,7 @@
     <div class="card border-0 shadow-lg mb-5">
         <div class="card-header bg-primary-accent text-white fw-bolder py-3 d-flex justify-content-between align-items-center">
             <span class="fs-5"><i class="bi bi-list-ul me-2"></i> Recent Courses Activity</span>
-            <a href="#" class="btn btn-sm btn-outline-light d-none d-sm-inline-block">View All</a>
+            <a href="{{ route('courses.index') }}"  class="btn btn-sm btn-outline-light d-none d-sm-inline-block">View All</a>
         </div>
         <div class="card-body p-0 table-responsive">
             <table class="table table-striped table-hover align-middle mb-0">
@@ -163,7 +163,6 @@
                         <h5 class="fw-bolder text-dark mb-1 d-flex align-items-center"><i class="bi bi-person-lines-fill me-2 text-primary-accent"></i> View All Users</h5>
                         <p class="text-muted small mb-0">See list and manage user accounts.</p>
                     </div>
-                    {{-- Assuming 'users.index' route exists --}}
                     <a href="#" class="btn btn-primary-accent btn-sm ms-3 mt-1">Go <i class="bi bi-arrow-right"></i></a>
                 </div>
             </div>
@@ -175,7 +174,6 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
 
 <style>
-/* Define a custom primary accent color */
 .text-primary-accent { color: #007bff !important; } /* A vibrant blue */
 .bg-primary-accent { background-color: #007bff !important; }
 .btn-primary-accent {
@@ -188,7 +186,6 @@
     border-color: #0056b3 !important;
 }
 
-/* Light Backgrounds for Stats */
 .bg-info-light { background-color: #cce5ff !important; }    /* Light Blue */
 .bg-success-light { background-color: #d4edda !important; } /* Light Green */
 .bg-warning-light { background-color: #fff3cd !important; } /* Light Yellow */
@@ -196,7 +193,6 @@
 .bg-secondary-light { background-color: #e2e6ea !important; } /* Light Gray */
 
 
-/* General Card Styles */
 .card {
     border-radius: 12px; /* Smoother corners */
     transition: transform 0.2s;
@@ -211,7 +207,6 @@
     border-left: 5px solid #007bff; /* Left border for emphasis */
 }
 
-/* Icon Circle for Stats */
 .icon-circle {
     width: 55px;
     height: 55px;
@@ -222,7 +217,6 @@
     opacity: 0.9;
 }
 
-/* Table Enhancements */
 .table {
     border-collapse: separate;
 }
