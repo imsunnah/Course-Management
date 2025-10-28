@@ -13,13 +13,12 @@ use App\Models\Category;
 use Illuminate\Support\Facades\Storage;
 
 class CourseController extends Controller
-{    // List all courses
+{
     public function index()
     {
         $courses = Course::latest()->paginate(10);
         return view('course.index', compact('courses'));
     }
-    // Show create form
     public function create()
     {
         $categories = Category::all();
@@ -27,15 +26,11 @@ class CourseController extends Controller
         return view('course.create', compact('categories'));
     }
 
-    // Store a new course
     public function store(CourseRequest $request)
     {
-
-        // Start DB transaction for safety
         DB::beginTransaction();
 
         try {
-            // Create Course
             $course = Course::create([
                 'title' => $request->title,
                 'summary' => $request->summary,
@@ -57,17 +52,24 @@ class CourseController extends Controller
                         'description' => $moduleData['description'] ?? null,
                     ]);
 
-                    // Module contents
                     if (!empty($moduleData['contents'])) {
                         $contents = collect($moduleData['contents'])
                             ->filter(fn($content) => !blank($content['title']))
                             ->map(function ($content) {
+                                $videoPath = null;
+                                if (!empty($content['file']) && isset($content['video_type']) && $content['video_type'] == 0) {
+                                    $videoPath = $content['file']->store('contents', 'public');
+                                }
+                                $videoLink = null;
+                                if (!empty($content['link']) && isset($content['video_type']) && $content['video_type'] == 1) {
+                                    $videoLink = $content['link'];
+                                }
+
                                 return [
                                     'title' => $content['title'],
                                     'video_type' => $content['video_type'] ?? null,
-                                    'video_path' => !empty($content['file'])
-                                        ? $content['file']->store('contents', 'public')
-                                        : null,
+                                    'video_path' => $videoPath,
+                                    'video_link' => $videoLink,
                                     'length' => $content['length'] ?? null,
                                     'text' => $content['text'] ?? null,
                                 ];
@@ -78,13 +80,17 @@ class CourseController extends Controller
                 }
             }
 
+
             DB::commit();
+
             return redirect()->route('courses.index')
                 ->with('success', 'Course created successfully!');
         } catch (\Throwable $e) {
             DB::rollBack();
-            Log::error('Course store failed: ' . $e->getMessage());
-            return back()->with('error', $e->getMessage());
+
+            \Log::error('Course store failed: ' . $e->getMessage());
+
+            return redirect()->route('error.page');
         }
     }
 
@@ -102,8 +108,7 @@ class CourseController extends Controller
     public function show(Course $course)
     {
         $categories = Category::all();
-                return view('course.singleShow', compact('course', 'categories'));
-
+        return view('course.singleShow', compact('course', 'categories'));
     }
 
     public function update(CourseRequest $request, Course $course)
@@ -122,7 +127,6 @@ class CourseController extends Controller
                 'course_price' => $request->course_price,
                 'feature_video' => $request->hasFile('feature_video')
                     ? tap($request->file('feature_video')->store('feature_videos', 'public'), function () use ($course) {
-                        // Delete old feature video if replaced
                         if ($course->feature_video && Storage::disk('public')->exists($course->feature_video)) {
                             Storage::disk('public')->delete($course->feature_video);
                         }
@@ -162,20 +166,30 @@ class CourseController extends Controller
                 // ---------------------------
                 $existingContentIds = $module->contents()->pluck('id')->toArray();
                 $updatedContentIds = [];
-
                 foreach ($moduleData['contents'] ?? [] as $contentData) {
                     if (blank($contentData['title'])) continue;
 
-                    // Prepare file
-                    $filePath = !empty($contentData['file'])
-                        ? $contentData['file']->store('contents', 'public')
-                        : ($contentData['video_path'] ?? null);
+                    $videoPath = null;
+                    $videoLink = null;
 
-                    // Update or create content
+                    if (isset($contentData['video_type'])) {
+                        if ($contentData['video_type'] == 0) {
+                            if (!empty($contentData['file'])) {
+                                $videoPath = $contentData['file']->store('contents', 'public');
+                                $videoLink = null;
+                            } else {
+                                $videoPath = $contentData['video_path'] ?? null;
+                            }
+                        } elseif ($contentData['video_type'] == 1) {
+                            $videoLink = $contentData['link'] ?? null;
+                            $videoPath = null;
+                        }
+                    }
+
+                    // Update existing content
                     if (!empty($contentData['id']) && in_array($contentData['id'], $existingContentIds)) {
                         $content = $module->contents()->find($contentData['id']);
 
-                        // Delete old file if replaced
                         if (!empty($contentData['file']) && $content->video_path && Storage::disk('public')->exists($content->video_path)) {
                             Storage::disk('public')->delete($content->video_path);
                         }
@@ -183,25 +197,27 @@ class CourseController extends Controller
                         $content->update([
                             'title' => $contentData['title'],
                             'video_type' => $contentData['video_type'] ?? null,
-                            'video_path' => $filePath,
+                            'video_path' => $videoPath,
+                            'video_link' => $videoLink,
                             'length' => $contentData['length'] ?? null,
                             'text' => $contentData['text'] ?? null,
                         ]);
 
                         $updatedContentIds[] = $content->id;
                     } else {
+                        // Create new content
                         $newContent = $module->contents()->create([
                             'title' => $contentData['title'],
                             'video_type' => $contentData['video_type'] ?? null,
-                            'video_path' => $filePath,
+                            'video_path' => $videoPath,
+                            'video_link' => $videoLink,
                             'length' => $contentData['length'] ?? null,
                             'text' => $contentData['text'] ?? null,
                         ]);
+
                         $updatedContentIds[] = $newContent->id;
                     }
                 }
-
-                // Delete removed contents + their files
                 $module->contents()
                     ->whereNotIn('id', $updatedContentIds)
                     ->get()
@@ -213,7 +229,6 @@ class CourseController extends Controller
                     });
             }
 
-            // Delete removed modules + their contents & files
             $course->modules()
                 ->whereNotIn('id', $updatedModuleIds)
                 ->get()

@@ -63,15 +63,15 @@
                                     </span>
 
                                     <div class="btn-group" role="group">
-                                        <a href="{{ route('courses.show', $course->id) }}" class="btn btn-sm btn-info"
+                                        <a href="{{ route('courses.show', $course) }}" class="btn btn-sm btn-info"
                                             title="View">
                                             <i class="bi bi-eye"></i>
                                         </a>
-                                        <a href="{{ route('courses.edit', $course->id) }}" class="btn btn-sm btn-warning"
+                                        <a href="{{ route('courses.edit', $course) }}" class="btn btn-sm btn-warning"
                                             title="Edit">
                                             <i class="bi bi-pencil-square"></i>
                                         </a>
-                                        <form action="{{ route('courses.destroy', $course->id) }}" method="POST"
+                                        <form action="{{ route('courses.destroy', $course) }}" method="POST"
                                             onsubmit="return confirm('Delete this course?');" class="d-inline">
                                             @csrf
                                             @method('DELETE')

@@ -14,7 +14,7 @@
         </a>
     </div>
 
-    <form id="courseForm" action="{{ route('courses.update', $course->id) }}" method="POST" enctype="multipart/form-data" class="mt-4">
+    <form id="courseForm" action="{{ route('courses.update', $course) }}" method="POST" enctype="multipart/form-data" class="mt-4">
         @csrf
         @method('PUT')
 
@@ -179,39 +179,64 @@ document.addEventListener('DOMContentLoaded', function(){
     // Initialize CKEditor for existing module descriptions
     document.querySelectorAll('.module-description').forEach(textarea => initCKEditor(textarea));
 
-    function addContent(container, moduleIndex){
-        const contentCount = container.querySelectorAll('.content-item').length + 1;
-        const contentDiv = document.createElement('div');
-        contentDiv.classList.add('content-item','card','mb-2','shadow-sm');
-        contentDiv.innerHTML = `
-            <div class="card-header text-white d-flex justify-content-between align-items-center py-1 px-2" style="background-color:#065794;   >
-                <h6 class="mb-0">Content ${contentCount}</h6>
-                <button type="button" class="btn btn-outline-danger btn-sm remove-content">X</button>
+function addContent(container, moduleIndex){
+    const contentCount = container.querySelectorAll('.content-item').length + 1;
+    const contentDiv = document.createElement('div');
+    contentDiv.classList.add('content-item','card','mb-2','shadow-sm');
+
+    contentDiv.innerHTML = `
+        <div class="card-header text-white d-flex justify-content-between align-items-center py-1 px-2" style="background-color:#065794;">
+            <h6 class="mb-0">Content ${contentCount}</h6>
+            <button type="button" class="btn btn-outline-danger btn-sm remove-content">X</button>
+        </div>
+        <div class="card-body p-2">
+            <div class="mb-2">
+                <label class="form-label">Content Title</label>
+                <input type="text" name="modules[${moduleIndex}][contents][new_${contentCount}][title]" class="form-control" required>
             </div>
-            <div class="card-body p-2">
-                <div class="mb-2">
-                    <label class="form-label">Content Title</label>
-                    <input type="text" name="modules[${moduleIndex}][contents][new_${contentCount}][title]" class="form-control" required>
-                </div>
-                <div class="mb-2">
-                    <label class="form-label">Video Type</label>
-                    <select name="modules[${moduleIndex}][contents][new_${contentCount}][video_type]" class="form-select">
-                        <option value="0">Video File</option>
-                        <option value="1">Video Link</option>
-                    </select>
-                </div>
-                <div class="mb-2">
-                    <label class="form-label">Upload File</label>
-                    <input type="file" name="modules[${moduleIndex}][contents][new_${contentCount}][file]" class="form-control" required>
-                </div>
-                <div class="mb-2">
-                    <label class="form-label">Content Length (HH:MM:SS)</label>
-                    <input type="text" name="modules[${moduleIndex}][contents][new_${contentCount}][length]" class="form-control" placeholder="00:00:00">
-                </div>
+            <div class="mb-2">
+                <label class="form-label">Video Type</label>
+                <select name="modules[${moduleIndex}][contents][new_${contentCount}][video_type]" class="form-select video-type-select">
+                    <option value="0">Video File</option>
+                    <option value="1">Video Link</option>
+                </select>
             </div>
-        `;
-        container.appendChild(contentDiv);
-    }
+
+            <div class="mb-2 video-file-group">
+                <label class="form-label">Upload File</label>
+                <input type="file" name="modules[${moduleIndex}][contents][new_${contentCount}][file]" class="form-control">
+            </div>
+
+            <div class="mb-2 video-link-group" style="display:none;">
+                <label class="form-label">Video Link</label>
+                <input type="url" name="modules[${moduleIndex}][contents][new_${contentCount}][link]" class="form-control" placeholder="https://example.com/video">
+            </div>
+
+            <div class="mb-2">
+                <label class="form-label">Content Length (HH:MM:SS)</label>
+                <input type="text" name="modules[${moduleIndex}][contents][new_${contentCount}][length]" class="form-control" placeholder="00:00:00">
+            </div>
+        </div>
+    `;
+
+    container.appendChild(contentDiv);
+
+    // Toggle file/link input based on video type
+    const typeSelect = contentDiv.querySelector('.video-type-select');
+    const fileGroup = contentDiv.querySelector('.video-file-group');
+    const linkGroup = contentDiv.querySelector('.video-link-group');
+
+    typeSelect.addEventListener('change', () => {
+        if (typeSelect.value === "0") {
+            fileGroup.style.display = 'block';
+            linkGroup.style.display = 'none';
+        } else {
+            fileGroup.style.display = 'none';
+            linkGroup.style.display = 'block';
+        }
+    });
+}
+
 
     function addNewModule(){
         moduleCount++;

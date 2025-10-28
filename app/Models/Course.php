@@ -12,7 +12,10 @@ class Course extends Model
     public function modules() {
         return $this->hasMany(Module::class);
     }
-
+public function getRouteKeyName()
+{
+    return 'slug';
+}
     protected static function boot()
     {
         parent::boot();
