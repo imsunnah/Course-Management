@@ -33,10 +33,16 @@
                         @enderror
                     </div>
 
-                    <div class="col-md-4">
-                        <label class="form-label fw-semibold">Feature Video</label>
-                        <input type="file" name="feature_video" class="form-control shadow-sm">
-                    </div>
+              <div class="col-md-4">
+    <label class="form-label fw-semibold">Feature Video</label>
+    <input type="file" name="feature_video" class="form-control shadow-sm">
+    <small class="text-danger d-block mt-1">Allowed formats: mp4, mov, avi</small>
+    @error('feature_video')
+        <small class="text-danger">{{ $message }}</small>
+    @enderror
+</div>
+
+
 
                     <div class="col-md-4">
                         <label class="form-label fw-semibold">Level</label>
@@ -193,10 +199,11 @@
                 </select>
             </div>
 
-            <div class="mb-2 video-file-group">
-                <label class="form-label">Upload File</label>
-                <input type="file" name="modules[${moduleIndex}][contents][${contentCount}][file]" class="form-control shadow-sm">
-            </div>
+<div class="mb-2 video-file-group">
+    <label class="form-label">Upload File</label>
+    <input type="file" name="modules[${moduleIndex}][contents][${contentCount}][file]" class="form-control shadow-sm">
+    <small class="text-danger d-block mt-1">Allowed formats: mp4, mov, avi</small>
+</div>
 
             <div class="mb-2 video-link-group" style="display:none;">
                 <label class="form-label">Video Link</label>

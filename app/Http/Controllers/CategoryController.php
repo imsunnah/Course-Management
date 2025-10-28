@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 
 class CategoryController extends Controller
 {
@@ -18,24 +19,34 @@ class CategoryController extends Controller
         }
     }
 
-    public function store(Request $request)
-    {
-        try {
-            $request->validate([
-                'name' => 'required|string|max:255|unique:categories,name',
-            ]);
+public function store(Request $request)
+{
+    try {
+        // Validate input
+        $request->validate([
+            'name' => 'required|string|max:255|unique:categories,name',
+        ]);
 
-            Category::create([
-                'name' => $request->name,
-                'status' => $request->status ?? 1,
-            ]);
+        // Create category with default status active
+        Category::create([
+            'name' => $request->name,
+            'status' => $request->status ?? 1, // default to Active
+        ]);
 
-            return redirect()->back()->with('success', 'Category created successfully!');
-        } catch (\Throwable $e) {
-            \Log::error('Category Store Error: ' . $e->getMessage());
-            return redirect()->route('error.page');
-        }
+        return redirect()->back()->with('success', 'Category created successfully!');
+
+    } catch (ValidationException $e) {
+        // Handle duplicate name or other validation errors
+        return redirect()->back()
+            ->withErrors($e->errors())
+            ->withInput();
+
+    } catch (\Throwable $e) {
+        \Log::error('Category Store Error: ' . $e->getMessage());
+        return redirect()->back()->with('error', 'Something went wrong while creating the category.');
     }
+}
+
 
     public function edit(Category $category)
     {

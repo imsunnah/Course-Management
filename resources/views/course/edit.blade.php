@@ -34,6 +34,8 @@
                     <div class="col-md-4">
                         <label class="form-label">Feature Video</label>
                         <input type="file" name="feature_video" class="form-control">
+                        <small class="text-danger d-block mt-1">Allowed formats: mp4, mov, avi</small>
+
                         @if ($course->feature_video)
                             <video width="100%" height="150" controls class="mt-2">
                                 <source src="{{ asset('storage/' . $course->feature_video) }}" type="video/mp4">
@@ -47,7 +49,8 @@
                         <select name="level" class="form-select">
                             <option value="">Select Level</option>
                             <option value="Beginner" {{ $course->level == 'Beginner' ? 'selected' : '' }}>Beginner</option>
-                            <option value="Intermediate" {{ $course->level == 'Intermediate' ? 'selected' : '' }}>Intermediate
+                            <option value="Intermediate" {{ $course->level == 'Intermediate' ? 'selected' : '' }}>
+                                Intermediate
                             </option>
                             <option value="Advanced" {{ $course->level == 'Advanced' ? 'selected' : '' }}>Advanced</option>
                         </select>
@@ -58,7 +61,8 @@
                         <select name="category_id" class="form-select">
                             <option value="">Select Category</option>
                             @foreach ($categories as $category)
-                                <option value="{{ $category->id }}" {{ $course->category_id == $category->id ? 'selected' : '' }}>
+                                <option value="{{ $category->id }}"
+                                    {{ $course->category_id == $category->id ? 'selected' : '' }}>
                                     {{ $category->name }}</option>
                             @endforeach
                         </select>
@@ -132,9 +136,11 @@
                                                         name="modules[{{ $module->id }}][contents][{{ $content->id }}][video_type]"
                                                         class="form-select video-type-select">
                                                         <option value="0"
-                                                            {{ $content->video_type == 0 ? 'selected' : '' }}>Video File</option>
+                                                            {{ $content->video_type == 0 ? 'selected' : '' }}>Video File
+                                                        </option>
                                                         <option value="1"
-                                                            {{ $content->video_type == 1 ? 'selected' : '' }}>Video Link</option>
+                                                            {{ $content->video_type == 1 ? 'selected' : '' }}>Video Link
+                                                        </option>
                                                     </select>
                                                 </div>
 
@@ -258,6 +264,7 @@
                 <div class="mb-2 video-file-group">
                     <label class="form-label">Upload File</label>
                     <input type="file" name="modules[${moduleIndex}][contents][new_${contentCount}][file]" class="form-control">
+                    <small class="text-danger d-block mt-1">Allowed formats: mp4, mov, avi</small>
                 </div>
 
                 <div class="mb-2 video-link-group" style="display:none;">
